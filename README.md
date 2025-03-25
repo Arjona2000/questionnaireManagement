@@ -37,9 +37,6 @@ API Specification:
 		POST: /question/{id:uuid}: Responde una pregunta dado su ID
 
 	Ambos endpoints deberían soportar una solicitud flexible adecuándose a los requisitos de cada tipo de pregunta
-
-NOTA: Para realizar los primeros commits en lugar de utilizar un UUID, utilicé un long y los endpoints solo son /question/{id}, para poder trabajar más fácilmente y comprobar que el código funciona correctamente y devuelve las respuestas esperadas
-
 El sistema implementa una API REST para crear y responder preguntas únicamente de valoración, las cuales permiten a los usuarios calificar en una escala numérica del 1 al 10, aunque si no se especifica rango al crear la pregunta, será del 1 al 5.
 
 El proyecto sigue una arquitectura en capas típica de Spring Boot:
