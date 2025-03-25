@@ -39,21 +39,82 @@ API Specification:
 	Ambos endpoints deberían soportar una solicitud flexible adecuándose a los requisitos de cada tipo de pregunta
 El sistema implementa una API REST para crear y responder preguntas únicamente de valoración, las cuales permiten a los usuarios calificar en una escala numérica del 1 al 10, aunque si no se especifica rango al crear la pregunta, será del 1 al 5.
 
-El proyecto sigue una arquitectura en capas típica de Spring Boot:
+El proyecto sigue la siguiente arquitectura típica de un proyecto Spring Boot:
 
-	com.interview.questionaire_management/
+	com.interview.questionnaireManagement/
 	├── Controller/
-	│   └── RatingQuestionController.java
+	│   └── QuestionController.java
 	├── DTO/
+	│   ├── ApiResponseDTO.java
+	│   ├── CreateMultiSelectQuestionDTO.java
 	│   ├── CreateRatingQuestionDTO.java
-	│   └── RatingAnswerDTO.java
-	├── Model/
-	│   └── RatingQuestion.java
+	│   ├── CreateSingleSelectQuestionDTO.java
+	│   ├── MultiSelectAnswerDTO.java
+	│   ├── QuestionResponseDTO.java
+	│   ├── RatingAnswerDTO.java
+	│   └── SingleSelectAnswerDTO.java
+	├── Entities/
+	│   ├── MultiSelectQuestion.java
+	│   ├── RatingQuestion.java
+	│   └── SingleSelectQuestion.java
 	├── Repositories/
-	│   └── RatingQuestionRepository.java
+	│   ├── MultiSelectQuestionRepository.java
+	│   ├── RatingQuestionRepository.java
+	│   └── SingleSelectQuestionRepository.java
 	├── Service/
-	│   └── RatingQuestionService.java
-	└── QuestionaireManagementApplication.java
+	│   ├── MultiSelectQuestionService.java
+	│   ├── QuestionTypeFactory.java
+	│   ├── RatingQuestionService.java
+	│   └── SingleSelectQuestionService.java
+	└── QuestionnaireManagementApplication.java
+Donde tenemos:
+
+	1. Capa de Entidades (Entities)
+	
+	RatingQuestion: Preguntas de valoración con rango personalizable (1-10)
+	MultiSelectQuestion: Preguntas con múltiples opciones seleccionables
+	SingleSelectQuestion: Preguntas con una sola opción seleccionable
+	
+	2. Capa de Repositorios (Repositories)
+	
+	Implementan almacenamiento en memoria usando HashMap<UUID, Entity>
+	Proporcionan métodos para guardar, buscar y verificar existencia
+	Cada tipo de pregunta tiene su propio repositorio
+	
+	3. Capa de Servicios (Service)
+	
+	Servicios específicos para cada tipo de pregunta:
+	
+	Validación de datos
+	Lógica de negocio específica
+	Interacción con repositorios
+	
+	QuestionTypeFactory: Implementa el patrón Factory
+	
+	Centraliza la creación y respuesta de diferentes tipos de preguntas
+	Maneja distintos tipos mediante un enum QuestionType
+	Delega a los servicios específicos
+	
+	4. Capa de DTOs (Data Transfer Objects)
+	
+	DTOs de creación para cada tipo de pregunta
+	DTOs de respuesta para cada tipo de pregunta
+	ApiResponseDTO: Estandariza el formato de respuesta
+	
+	5. Capa de Controladores (Controller)
+	
+	QuestionController: Controlador unificado
+	
+	Expone endpoints para todos los tipos de preguntas
+	Usa el patrón REST (PUT para crear, POST para responder)
+	Utiliza el factory para delegar operaciones
+	URLs organizadas por tipo: /question/{tipo}/{id}
+
+Y el flujo de datos sería el siguiente:
+	Para la creación de preguntas:
+	Cliente → QuestionController → QuestionTypeFactory → Servicio específico → Repositorio → Entidad
+	Para las respuestas a las preguntas:
+	Cliente → QuestionController → QuestionTypeFactory → Servicio específico → Repositorio → Validación → Respuesta
 
 Los componentes principales de la aplicación son:
 
@@ -144,7 +205,15 @@ Los componentes principales de la aplicación son:
 			- Respuesta a preguntas: 
 				- Validación de que la respuesta está dentro del rango permitido
 				- Manejo de errores en caso de que la pregunta no exista
+    
 
+Patrones de diseño utilizados:
+
+	- Patrón Factory: Para centralizar la creación y manipulación de objetos
+	- Patrón repository: Para abstraer la persistencia de datos
+ 	- Patrón DTO: Separación de objetos de transferencia y entidades de dominio
+  	- Arquitectura en capas: Separación clara de responsabilidades
+   
 Tecnologías utilizadas:
 
 	- Java 17: Lenguaje de programación
@@ -153,9 +222,4 @@ Tecnologías utilizadas:
 	- Spring DevTools: Para el desarrollo
 	- Lombok: Para reducir código repetitivo
 
-Mejoras futuras:
-	
-	- Mejoración en la validación: Añadir más validaciones para los datos de entrada.
-	- Manejo personalizado de excepciones: Implementar un manejo de excepciones global para proporcionar respuestas más detalladas.
- 	- Actualizar el código para almacenarlo en una Base de Datos, en lugar de en la memoria del programa (esto hace que se pierda la información con cada nueva ejecución de la aplicación)
 
