@@ -111,8 +111,10 @@ Donde tenemos:
 	URLs organizadas por tipo: /question/{tipo}/{id}
 
 Y el flujo de datos sería el siguiente:
+
 	Para la creación de preguntas:
 	Cliente → QuestionController → QuestionTypeFactory → Servicio específico → Repositorio → Entidad
+ 
 	Para las respuestas a las preguntas:
 	Cliente → QuestionController → QuestionTypeFactory → Servicio específico → Repositorio → Validación → Respuesta
 
